@@ -748,6 +748,26 @@ class ComputeClient(object):
                      project_id, zone, results)
         return results
 
+    def get_snapshots(self, project_id):
+        """Return the list of all snapshots in the project.
+
+        Args:
+            project_id (str): The project id.
+
+        Returns:
+            list: A list of snapshot resources for this project.
+        """
+
+        try:
+            LOGGER.debug('Getting the list of all snapshots in project: %s',
+                     project_id)
+            repository = self.repository.snapshots
+            results = repository.list(project_id)
+            return api_helpers.flatten_list_results(results, 'items')
+        except (errors.HttpError, HttpLib2Error) as e:
+            LOGGER.warn(api_errors.ApiExecutionError(project_id, e))
+            raise api_errors.ApiExecutionError(project_id, e)
+
     def get_firewall_rules(self, project_id):
         """Get the firewall rules for a given project id.
 
