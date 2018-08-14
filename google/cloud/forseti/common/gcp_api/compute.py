@@ -203,6 +203,7 @@ class ComputeRepositoryClient(_base_repository.BaseRepositoryClient):
         self._networks = None
         self._projects = None
         self._region_instance_groups = None
+        self._snapshots = None
         self._subnetworks = None
 
         super(ComputeRepositoryClient, self).__init__(
@@ -319,6 +320,14 @@ class ComputeRepositoryClient(_base_repository.BaseRepositoryClient):
             self._region_instance_groups = self._init_repository(
                 _ComputeRegionInstanceGroupsRepository)
         return self._region_instance_groups
+
+    @property
+    def snapshots(self):
+        """Returns a _ComputeSnapshotsRepository instance."""
+        if not self._snapshots:
+            self._snapshots = self._init_repository(
+                _ComputeSnapshotsRepository)
+        return self._snapshots
 
     @property
     def subnetworks(self):
@@ -615,6 +624,20 @@ class _ComputeRegionInstanceGroupsRepository(repository_mixins.ListQueryMixin,
         kwargs['region'] = region
         return repository_mixins.ListQueryMixin.list(
             self, resource, verb='listInstances', **kwargs)
+
+
+class _ComputeSnapshotsRepository(repository_mixins.ListQueryMixin,
+                              _base_repository.GCPRepository):
+    """Implementation of Compute Snapshots repository."""
+
+    def __init__(self, **kwargs):
+        """Constructor.
+
+        Args:
+            **kwargs (dict): The args to pass into GCPRepository.__init__()
+        """
+        super(_ComputeSnapshotsRepository, self).__init__(
+            component='snapshots', **kwargs)
 
 
 class _ComputeSubnetworksRepository(repository_mixins.AggregatedListQueryMixin,
